@@ -49,4 +49,5 @@ public:
 	void InjectBin(DWORD pid);
 	void InjectDll(DWORD pid);
 	void TcharToChar(const TCHAR * tchar, char * _char);
+    afx_msg void OnBnClickedBtnviewprocess();
 };

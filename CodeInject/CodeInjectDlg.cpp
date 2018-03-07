@@ -6,6 +6,7 @@
 #include "CodeInject.h"
 #include "CodeInjectDlg.h"
 #include "afxdialogex.h"
+#include "ShowProcessDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -71,6 +72,7 @@ BEGIN_MESSAGE_MAP(CCodeInjectDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BTNINJECTCODE, &CCodeInjectDlg::OnBnClickedBtninjectcode)
 	ON_BN_CLICKED(IDC_BTNINJECTDLL, &CCodeInjectDlg::OnBnClickedBtninjectdll)
+    ON_BN_CLICKED(IDC_BTNVIEWPROCESS, &CCodeInjectDlg::OnBnClickedBtnviewprocess)
 END_MESSAGE_MAP()
 
 
@@ -106,6 +108,11 @@ BOOL CCodeInjectDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	m_editWindowTitle.SetWindowText(L"拖放图标到目标窗口,或直接输入PID");
+
+    if (!AdjustPr())
+    {
+        return TRUE;
+    }
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -324,10 +331,6 @@ void CCodeInjectDlg::TcharToChar(const TCHAR * tchar, char * _char)
 
 void CCodeInjectDlg::InjectDll(DWORD pid)
 {
-	if (!AdjustPr())
-	{
-		return;
-	}
 	TCHAR szFileName[MAX_PATH] = { 0 };
 
 	OPENFILENAME openFileName = { 0 };
@@ -374,4 +377,13 @@ void CCodeInjectDlg::InjectDll(DWORD pid)
 	HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)GetProcAddress(hModule, "LoadLibraryA"), lpAdd, 0, NULL);
 	CloseHandle(hThread);
 	VirtualFreeEx(hProcess, lpAdd, MAX_PATH, MEM_RELEASE);
+}
+
+void CCodeInjectDlg::OnBnClickedBtnviewprocess()
+{
+    CShowProcessDlg dlg;
+    if (dlg.DoModal() == IDOK)
+    {
+        m_editPid.SetWindowText(dlg.GetSelectPid());
+    }
 }
